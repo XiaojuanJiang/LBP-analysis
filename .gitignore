@@ -1,24 +1,36 @@
+####加载包
 library(TwoSampleMR)
+####读取暴露并查看
 exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
 View(exposure_online)
 setwd("")
+
+####结局读取与提取
 a<-read.table("finngen_R7_M13_LOWBACKPAIN.txt",header = T,sep="\t")
 View(a)
 c<-merge(exposure_online,a,by.x ="SNP",by.y = "rsids")
 View(c)
 write.csv(c,file = "outcome.csv")
+
+
+###结局读取与协同
 outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
 View(outcome_dat)
 write.csv(outcome_dat,file = "outcome_dat.csv")
 dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
 write.csv(dat,file = "dat.csv")
 
+
+####MR分析
 mr(dat)
 
 generate_odds_ratios(mr_res=mr(dat))
 mr_method_list()
 mr(dat,method_list=c("mr_ivw","mr_weighted_median","mr_egger_regression"))
 mr_scatter_plot(mr_results = mr(dat,method_list = c("mr_ivw","mr_weighted_median","mr_egger_regression")),dat)
+
+
+####灵敏度检验
 mr_heterogeneity(dat)
 mr_funnel_plot(singlesnp_results = mr_singlesnp(dat))
 mr_pleiotropy_test(dat)
@@ -32,7 +44,7 @@ dat<-read.csv("dat.csv")
 
 
 
-
+####radial MR分析
 radial_data <- format_radial(dat$beta.exposure,dat$beta.outcome,dat$se.exposure,
                              dat$se.outcome,dat$SNP)
 ivw.model <- ivw_radial(r_input = radial_data, alpha = 0.05,
