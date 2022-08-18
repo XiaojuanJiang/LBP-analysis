@@ -49,7 +49,58 @@ dat<-read.csv("dat.csv")
 
 ####Radial MR analysis
 library()
+radialmr(-------------)
+----------
 
+####Radial MR plot
+plot()
+
+
+
+######Multiple replicated IVW analysis
+---------
+
+
+#####Replicate analysis
+####加载包
+library(TwoSampleMR)
+####读取暴露并查看
+setwd("")
+exposure<-read_exposure(files="",------)
+View(exposure)
+
+
+
+###结局读取与协同
+outcome_dat <- read_outcome_data( snps = exposure$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
+View(outcome_dat)
+write.csv(outcome_dat,file = "outcome_dat.csv")
+
+####协同文件输出
+dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
+write.csv(dat,file = "dat.csv")
+
+
+####MR分析
+mr(dat)
+
+generate_odds_ratios(mr_res=mr(dat))
+mr_method_list()
+mr(dat,method_list=c("mr_ivw","mr_weighted_median","mr_egger_regression"))
+mr_scatter_plot(mr_results = mr(dat,method_list = c("mr_ivw","mr_weighted_median","mr_egger_regression")),dat)
+
+
+####灵敏度检验
+mr_heterogeneity(dat)
+mr_funnel_plot(singlesnp_results = mr_singlesnp(dat))
+mr_pleiotropy_test(dat)
+mr_leaveoneout_plot(leaveoneout_results = mr_leaveoneout(dat))
+
+
+
+
+##########positive control analysis
+#########potential risk factors analysis
 
 
 
