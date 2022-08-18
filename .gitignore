@@ -1,3 +1,4 @@
+####Primary analysis
 ####加载包
 library(TwoSampleMR)
 ####读取暴露并查看
@@ -17,6 +18,8 @@ write.csv(c,file = "outcome.csv")
 outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
 View(outcome_dat)
 write.csv(outcome_dat,file = "outcome_dat.csv")
+
+####协同文件输出
 dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
 write.csv(dat,file = "dat.csv")
 
@@ -35,10 +38,19 @@ mr_heterogeneity(dat)
 mr_funnel_plot(singlesnp_results = mr_singlesnp(dat))
 mr_pleiotropy_test(dat)
 mr_leaveoneout_plot(leaveoneout_results = mr_leaveoneout(dat))
+
+####MR-PRESSO分析
 run_mr_presso(dat,NbDistribution = 3000)
 mr_heterogeneity(dat)
 
 write.csv(dat,file = "dat.csv")
 dat<-read.csv("dat.csv")
+
+
+####Radial MR analysis
+library()
+
+
+
 
 
