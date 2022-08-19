@@ -1,36 +1,48 @@
 ####Primary analysis
-####加载包
+####library packages need for analysis
 library(TwoSampleMR)
-####读取暴露并查看
+library(RadialMR)
+
+####read the exposure and check
 exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
 View(exposure_online)
-setwd("")
+####set working dictionary
+setwd("your work place")
 
-####结局读取与提取
-a<-read.table("finngen_R7_M13_LOWBACKPAIN.txt",header = T,sep="\t")
-View(a)
-c<-merge(exposure_online,a,by.x ="SNP",by.y = "rsids")
-View(c)
-write.csv(c,file = "outcome.csv")
-
-
-###结局读取与协同
-outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
-View(outcome_dat)
-write.csv(outcome_dat,file = "outcome_dat.csv")
+####outcome extract,the file from FinnGen should be download from FinnGen website, we also provided the 
+#####information extract from corresponding files,name as "finngen_R7_M13_LOWBACKPAIN1.csv"
+outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "finngen_R7_M13_LOWBACKPAIN1.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
 
 ####协同文件输出
 dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
-write.csv(dat,file = "dat.csv")
+
+write.csv(dat,file = "datprimaryanlysis.csv")
 
 
 ####MR分析
 mr(dat)
 
 generate_odds_ratios(mr_res=mr(dat))
-mr_method_list()
-mr(dat,method_list=c("mr_ivw","mr_weighted_median","mr_egger_regression"))
-mr_scatter_plot(mr_results = mr(dat,method_list = c("mr_ivw","mr_weighted_median","mr_egger_regression")),dat)
+
+
+#####mr plots,export the plots as pdf and then organize them in adobe illustration
+res_single <- mr_singlesnp(dat)
+res_single <- mr_singlesnp(dat, single_method="mr_meta_fixed")
+res_loo <- mr_leaveoneout(dat)
+res <- mr(dat, method_list=c("mr_egger_regression", "mr_ivw","mr_weighted_median")) 
+p1 <- mr_scatter_plot(res, dat)
+p1[[1]]
+res_single <- mr_singlesnp(dat)
+p2 <- mr_forest_plot(res_single)
+p2[[1]]
+
+res_loo <- mr_leaveoneout(dat)
+p3 <- mr_leaveoneout_plot(res_loo)
+p3[[1]]
+
+res_single <- mr_singlesnp(dat)
+p4 <- mr_funnel_plot(res_single)
+p4[[1]]
 
 
 ####灵敏度检验
@@ -41,45 +53,47 @@ mr_leaveoneout_plot(leaveoneout_results = mr_leaveoneout(dat))
 
 ####MR-PRESSO分析
 run_mr_presso(dat,NbDistribution = 3000)
-mr_heterogeneity(dat)
-
-write.csv(dat,file = "dat.csv")
-dat<-read.csv("dat.csv")
+####identify the outliers and then discard the outliers in the "datprimaryanlysis.csv", save and then performed other analyses with reloaded "datprimaryanlysis.csv"
 
 
 ####Radial MR analysis
-library()
-radialmr(-------------)
-----------
+dat <- read.csv("datprimaryanlysis.csv",header = T)
 
-####Radial MR plot
-plot()
+radial_data <- format_radial(dat$beta.exposure,dat$beta.outcome,dat$se.exposure,
+                             dat$se.outcome,dat$SNP)
+ivw.model <- ivw_radial(r_input = radial_data, alpha = 0.05,
+                        weights = 1, tol = 0.0001, summary = TRUE)
+ivw.model$outliers
+ 
+
+####Radial MR plot,export the plots as pdf and then organize them in adobe illustration
+plot_radial(ivw.model)
 
 
 
-######Multiple replicated IVW analysis
----------
+######Multiple replicated IVW analysis after removing outliers identified with radial MR
+dat <- read.csv("datprimaryanlysis.csv",header = T)
+mr_ivw_mre(dat$beta.exposure,dat$beta.outcome,dat$se.exposure,dat$se.outcome,parameters = default_parameters())
+  
 
 
 #####Replicate analysis
-####加载包
-library(TwoSampleMR)
-####读取暴露并查看
-setwd("")
-exposure<- read_exposure_data( filename = "exposure.csv", sep = ",", snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele", eaf_col = "eaf", pval_col = "pval",
-                                  phenotype_col = "exposure")
+
+####exposure were retrieve from previous literature, and was uploaded as "exposure_circulating VD.csv"
+exposure<- read_exposure_data( filename = "exposure_circulating VD.csv", sep = ",", snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele", eaf_col = "eaf", pval_col = "pval",
+                               phenotype_col = "exposure")
 View(exposure)
 
 
 
 ###结局读取与协同
-outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ieu-a-1102")
+outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ukb-b-9838")
 View(outcome_dat)
 write.csv(outcome_dat,file = "outcome_dat_replicate.csv")
 
 ####协同文件输出
 dat<-harmonise_data(exposure_dat = exposure,outcome_dat = outcome_dat)
-write.csv(dat,file = "dat.csv")
+write.csv(dat,file = "datreplicate.csv")
 
 
 ####MR分析
@@ -101,54 +115,65 @@ mr_leaveoneout_plot(leaveoneout_results = mr_leaveoneout(dat))
 ##########positive control analysis
 ####exposure----serum 25(OH)D
 exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
-View(exposure_online)
-setwd("")
-
-####结局读取与提取
-a<-read.table("finngen_R7_M13_LOWBACKPAIN.txt",header = T,sep="\t")
+exposure<- read_exposure_data( filename = "exposure_circulating VD.csv", sep = ",", snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele", eaf_col = "eaf", pval_col = "pval",
+                               phenotype_col = "exposure")
+####outcome were obtained from the FinnGen,we also provide information as "outcome_exposure_online_VDD.csv" and "outcome_exposure_VDD.csv"
+a<-read.table("finngen_R7_E4_VIT_D_DEF.txt",header = T,sep="\t")
 View(a)
 c<-merge(exposure_online,a,by.x ="SNP",by.y = "rsids")
 View(c)
-write.csv(c,file = "outcome.csv")
+write.csv(c,file = "outcome_exposure_online_VDD.csv")
+d<-merge(exposure,a,by.x ="SNP",by.y = "rsids")
+View(d)
+write.csv(d,file = "outcome_exposure_VDD.csv")
 
 
-###结局读取与协同
-outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
-View(outcome_dat)
-write.csv(outcome_dat,file = "outcome_dat.csv")
+###outcome
+outcome_dat1 <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome_exposure_online_VDD.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "sebeta",effect_allele_col = "alt",other_allele_col = "ref",pval_col = "pval")
+outcome_dat2 <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome_exposure_VDD.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "sebeta",effect_allele_col = "alt",other_allele_col = "ref",pval_col = "pval")
+
 
 ####协同文件输出
-dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
+dat1<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat1)
+dat2<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat2)
 write.csv(dat,file = "dat.csv")
 
 
 ####MR分析
-mr(dat)
+mr(dat1)
 
-generate_odds_ratios(mr_res=mr(dat))
+generate_odds_ratios(mr_res=mr(dat1))
+mr(dat2)
 
-#####circulating 25(OH)D
-exposure<- read_exposure_data( filename = "exposure.csv", sep = ",", snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele", eaf_col = "eaf", pval_col = "pval",
-                                  phenotype_col = "exposure")
-View(exposure)
-
-outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
-View(outcome_dat)
-write.csv(outcome_dat,file = "outcome_dat.csv")
-
-####协同文件输出
-dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
-write.csv(dat,file = "dat.csv")
-
-
-####MR分析
-mr(dat)
-
-generate_odds_ratios(mr_res=mr(dat))
-
+generate_odds_ratios(mr_res=mr(dat2))
 
 #########potential risk factors analysis
+####for alcohol intake frequency
 exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
-outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ieu-a-1102")
+outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ukb-b-5779")
+dat<-harmonise_data(exposure_dat = exposure,outcome_dat = outcome_dat)
+mr(dat)
+
+
+
+
+####for BMI
+exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
+outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ukb-b-19953")
+dat<-harmonise_data(exposure_dat = exposure,outcome_dat = outcome_dat)
+mr(dat)
+
+
+####for obesity
+exposure_online<-extract_instruments(outcomes= "ebi-a-GCST90000616")
+outcome_dat <- extract_outcome_data(snps = exposure$SNP,outcomes="ukb-b-15541")
+dat<-harmonise_data(exposure_dat = exposure,outcome_dat = outcome_dat)
+mr(dat)
+
+generate_odds_ratios(mr_res=mr(dat))
+
+
+
+
 
 
