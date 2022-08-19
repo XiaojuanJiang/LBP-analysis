@@ -1,0 +1,7 @@
+"","SNP","effect_allele.exposure","other_allele.exposure","eaf.exposure","beta.exposure","se.exposure","exposure","mr_keep.exposure","pval.exposure","pval_origin.exposure","id.exposure","data_source.exposure","#chrom","pos","ref","alt","nearest_genes","pval","mlogp","beta","sebeta","af_alt","af_alt_cases","af_alt_controls"
+"1","rs10741657","A","G",0.4,0.031,0.002,"exposure",TRUE,3.46892158358774e-54,"inferred","2FQVtF","textfile",11,14893332,"A","G","CYP2R1",0.740052,0.130738,0.0272956,0.082269,0.578415,0.585809,0.578407
+"2","rs10745742","T","C",0.4,0.017,0.002,"exposure",TRUE,1.89590696444066e-17,"inferred","2FQVtF","textfile",12,95964751,"C","T","AMDHD1",0.28095,0.551371,-0.0921473,0.085465,0.345722,0.329438,0.345739
+"3","rs12785878","T","G",0.75,0.036,0.002,"exposure",TRUE,1.94818978378743e-72,"inferred","2FQVtF","textfile",11,71456403,"G","T","NADSYN1",0.0578589,1.23763,-0.157966,0.0832819,0.60796,0.569074,0.608
+"4","rs17216707","T","C",0.79,0.026,0.003,"exposure",TRUE,4.4495519570209e-18,"inferred","2FQVtF","textfile",20,54115823,"T","C","CYP24A1",0.00228339,2.64142,0.279909,0.0917538,0.211702,0.264518,0.211648
+"5","rs3755967","T","C",0.28,-0.089,0.002,"exposure",TRUE,0,"inferred","2FQVtF","textfile",4,71743681,"C","T","GC",0.306606,0.51342,0.104528,0.102241,0.200366,0.215169,0.20035
+"6","rs8018720","C","G",0.82,-0.017,0.003,"exposure",TRUE,1.45602201478282e-08,"inferred","2FQVtF","textfile",14,39086981,"G","C","SEC23A",0.367148,0.435159,0.104221,0.115566,0.850146,0.867637,0.850127
