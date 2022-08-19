@@ -1,5 +1,9 @@
 ####Primary analysis
 ####library packages need for analysis
+install.packages("remots")
+remotes::install_github("MRCIEU/TwoSampleMR")
+install.packages("RadialMR")
+
 library(TwoSampleMR)
 library(RadialMR)
 
