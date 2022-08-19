@@ -135,12 +135,12 @@ write.csv(d,file = "outcome_exposure_VDD.csv")
 
 ###outcome
 outcome_dat1 <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome_exposure_online_VDD.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "sebeta",effect_allele_col = "alt",other_allele_col = "ref",pval_col = "pval")
-outcome_dat2 <- read_outcome_data( snps = exposure_online$SNP,filename = "outcome_exposure_VDD.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "sebeta",effect_allele_col = "alt",other_allele_col = "ref",pval_col = "pval")
+outcome_dat2 <- read_outcome_data( snps = exposure$SNP,filename = "outcome_exposure_VDD.csv",sep = ",",snp_col = "SNP",beta_col = "beta",se_col = "sebeta",effect_allele_col = "alt",other_allele_col = "ref",pval_col = "pval")
 
 
 ####协同文件输出
 dat1<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat1)
-dat2<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat2)
+dat2<-harmonise_data(exposure_dat = exposure,outcome_dat = outcome_dat2)
 write.csv(dat,file = "dat.csv")
 
 
