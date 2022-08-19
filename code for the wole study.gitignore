@@ -15,7 +15,8 @@ setwd("your work place")
 
 ####outcome extract,the file from FinnGen should be download from FinnGen website, we also provided the 
 #####information extract from corresponding files,name as "finngen_R7_M13_LOWBACKPAIN1.csv"
-outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "finngen_R7_M13_LOWBACKPAIN1.csv",sep = ",",snp_col = "rsids",beta_col = "beta",se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "p")
+outcome_dat <- read_outcome_data( snps = exposure_online$SNP,filename = "finngen_R7_M13_LOWBACKPAIN1.csv",sep = ",",snp_col = "SNP",beta_col = "beta",
+se_col = "se",effect_allele_col = "effect_allele",other_allele_col = "other_allele",pval_col = "pval")
 
 ####协同文件输出
 dat<-harmonise_data(exposure_dat = exposure_online,outcome_dat = outcome_dat)
